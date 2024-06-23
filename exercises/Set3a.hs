@@ -82,10 +82,10 @@ palindromeHalfs :: [String] -> [String]
 palindromeHalfs xs = map firstHalf (filter palindrome xs)
 
 firstHalf :: String -> String
-firstHalf s
- | mod len 2 == 0 = take (div len 2) s
- | otherwise = take ((div len 2) + 1) s
-where len = length s
+firstHalf s = if mod len 2 == 0
+              then take (div len 2) s
+              else take ((div len 2) + 1) s
+  where len = length s
 
 palindrome :: String -> Bool
 palindrome s = reverse s == s
@@ -109,7 +109,7 @@ capitalize :: String -> String
 capitalize s = unwords (map capitalizeFirst (words s))
 
 capitalizeFirst :: String -> String
-capitalizeFirst s = toUpper (head s) ++ tail s  
+capitalizeFirst s = toUpper (head s) : tail s
 
 ------------------------------------------------------------------------------
 -- Ex 6: powers k max should return all the powers of k that are less
