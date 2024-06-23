@@ -19,7 +19,7 @@ binomial :: Integer -> Integer -> Integer
 binomial n k
  | k == 0 = 1
  | n == 0 && k > 0 = 0
- | otherwise = binomial (n-1) k + binomial (n - 1) (k - 1)
+ | otherwise = binomial (n - 1) k + binomial (n - 1) (k - 1)
 
 ------------------------------------------------------------------------------
 -- Ex 2: implement the odd factorial function. Odd factorial is like
@@ -130,10 +130,10 @@ smallestDivisor n
  | n < 2 = n
  | otherwise = divideEvenly n (n - 1)
 
-divideEvenly :: Integer -> Integer
+divideEvenly :: Integer -> Integer -> Integer
 divideEvenly n 1 = n
 divideEvenly n divisor = if mod n divisor == 0
-                         then divisor
+                         then div n divisor
                          else divideEvenly n (divisor - 1)
 
 ------------------------------------------------------------------------------
@@ -164,4 +164,4 @@ isPrime n
 biggestPrimeAtMost :: Integer -> Integer
 biggestPrimeAtMost n = if isPrime n
                        then n
-                       else biggestPrmeAtMost (n - 1)
+                       else biggestPrimeAtMost (n - 1)
