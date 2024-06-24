@@ -126,7 +126,7 @@ capitalizeFirst s = toUpper (head s) : tail s
 --   * the function takeWhile
 
 powers :: Int -> Int -> [Int]
-powers k max = todo
+powers k max = takeWhile (\x -> x <= max) [ k ^ x | x <- [0..] ]
 
 ------------------------------------------------------------------------------
 -- Ex 7: implement a functional while loop. While should be a function
@@ -149,7 +149,9 @@ powers k max = todo
 --     ==> Avvt
 
 while :: (a->Bool) -> (a->a) -> a -> a
-while check update value = todo
+while check update value
+ | check value = while check update (update value)
+ | otherwise = value
 
 ------------------------------------------------------------------------------
 -- Ex 8: another version of a while loop. This time, the check
@@ -169,7 +171,8 @@ while check update value = todo
 -- Hint! Remember the case-of expression from lecture 2.
 
 whileRight :: (a -> Either b a) -> a -> b
-whileRight check x = todo
+whileRight check x = case check x of Left a -> a
+                                     Right a -> whileRight check a
 
 -- for the whileRight examples:
 -- step k x doubles x if it's less than k
@@ -193,7 +196,7 @@ bomb x = Right (x-1)
 -- Hint! This is a great use for list comprehensions
 
 joinToLength :: Int -> [String] -> [String]
-joinToLength = todo
+joinToLength len strings = [ a ++ b | a <- strings, b <- strings, length (a ++ b) == len ]
 
 ------------------------------------------------------------------------------
 -- Ex 10: implement the operator +|+ that returns a list with the first
@@ -207,6 +210,12 @@ joinToLength = todo
 --   [] +|+ [True]        ==> [True]
 --   [] +|+ []            ==> []
 
+(+|+) :: [a] -> [a] -> [a]
+a +|+ b
+ | null a && null b = []
+ | null a = [head b]
+ | null b = [head a]
+ | otherwise = head a : [head b]
 
 ------------------------------------------------------------------------------
 -- Ex 11: remember the lectureParticipants example from Lecture 2? We
@@ -223,7 +232,7 @@ joinToLength = todo
 --   sumRights [Left "bad!", Left "missing"]         ==>  0
 
 sumRights :: [Either a Int] -> Int
-sumRights = todo
+sumRights xs = foldr (+) 0 (rights xs)
 
 ------------------------------------------------------------------------------
 -- Ex 12: recall the binary function composition operation
@@ -239,7 +248,15 @@ sumRights = todo
 --   multiCompose [(3*), (2^), (+1)] 0 ==> 6
 --   multiCompose [(+1), (2^), (3*)] 0 ==> 2
 
-multiCompose fs = todo
+multiCompose :: [a -> a] -> a -> a
+multiCompose fs x
+ | length fs == 0 = x
+ | length fs == 1 = (head fs) x
+ | otherwise = compose (head fs) (tail fs) $ x
+
+compose f fs
+ | length fs == 1 = f . (head fs)
+ | otherwise = compose (f . head fs) (tail fs)
 
 ------------------------------------------------------------------------------
 -- Ex 13: let's consider another way to compose multiple functions. Given
@@ -260,7 +277,11 @@ multiCompose fs = todo
 --   multiApp id [head, (!!2), last] "axbxc" ==> ['a','b','c'] i.e. "abc"
 --   multiApp sum [head, (!!2), last] [1,9,2,9,3] ==> 6
 
-multiApp = todo
+multiApp :: ([b] -> c) -> [(a -> b)] -> a -> c
+multiApp f gs x = f (map (apply x) gs)
+
+apply :: a -> (a -> b) -> b
+apply a f = f a
 
 ------------------------------------------------------------------------------
 -- Ex 14: in this exercise you get to implement an interpreter for a
@@ -295,4 +316,14 @@ multiApp = todo
 -- function, the surprise won't work. See section 3.8 in the material.
 
 interpreter :: [String] -> [String]
-interpreter commands = todo
+interpreter commands = parseCommands commands [] 0 0
+
+parseCommands :: [String] -> [String] -> Int -> Int -> [String]
+parseCommands [] response x y = response
+parseCommands (command : commands) response x y
+ | command == "up" = parseCommands commands response x (y + 1)
+ | command == "down" = parseCommands commands response x (y - 1)
+ | command == "right" = parseCommands commands response (x + 1) y
+ | command == "left" = parseCommands commands response (x - 1) y
+ | command == "printY" = parseCommands commands (response ++ [show y]) x y
+ | command == "printX" = parseCommands commands (response ++ [show x]) x y
